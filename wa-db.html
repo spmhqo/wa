@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Contact Manager</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e5ddd5;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-card {
+            width: 100%;
+            max-width: 800px;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align: center;
+            color: #075e54;
+            margin-bottom: 20px;
+        }
+
+        /* টেবিল ডিজাইন */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        thead {
+            background-color: #075e54;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .wa-num {
+            font-weight: bold;
+            color: #25d366;
+        }
+
+        /* বাটন এরিয়া */
+        .controls {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 14px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn-select { background-color: #607d8b; color: white; } /* নেভি ব্লু/গ্রে কালার */
+        .btn-extract { background-color: #25d366; color: white; }
+        .btn-copy { background-color: #34b7f1; color: white; display: none; }
+
+        .btn:active { transform: scale(0.98); }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            margin-top: 15px;
+            padding: 10px;
+            border: 2px solid #25d366;
+            border-radius: 5px;
+            display: none;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 14px;
+            background: #f9f9f9;
+        }
+
+        /* মোবাইল রেসপন্সিভ টেবিল (Card View) */
+        @media screen and (max-width: 600px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            thead tr { position: absolute; top: -9999px; left: -9999px; }
+            tr {
+                border: 1px solid #ccc;
+                margin-bottom: 12px;
+                background: #fdfdfd;
+                border-radius: 8px;
+                padding: 5px 0;
+            }
+            td {
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-left: 45% !important;
+                text-align: right;
+                min-height: 25px;
+            }
+            td:last-child { border-bottom: none; }
+            td:before {
+                position: absolute;
+                left: 10px;
+                width: 40%;
+                font-weight: bold;
+                text-align: left;
+                content: attr(data-label);
+                color: #075e54;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-card">
+    <h2>WhatsApp Numbers</h2>
+
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Notes</th>
+                <th>WhatsApp Number</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- ডেটা এন্ট্রি -->
+            <tr>
+                <td data-label="Name"><input type="checkbox" class="row-check"> asdf</td>
+                <td data-label="Notes">Client A</td>
+                <td data-label="WhatsApp Number" class="num-val">1234567890</td>
+            </tr>
+            <tr>
+                <td data-label="Name"><input type="checkbox" class="row-check"> ghjk</td>
+                <td data-label="Notes">Client B</td>
+                <td data-label="WhatsApp Number" class="num-val">2345678901</td>
+            </tr>
+            <tr>
+                <td data-label="Name"><input type="checkbox" class="row-check"> lmnop</td>
+                <td data-label="Notes">Personal</td>
+                <td data-label="WhatsApp Number" class="num-val">3456789012</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="controls">
+        <!-- Select All বাটন -->
+        <button id="selectAllBtn" class="btn btn-select" onclick="toggleSelectAll()">Select All</button>
+        
+        <button class="btn btn-extract" onclick="doExtract()">Extract Selected</button>
+        
+        <textarea id="resultArea" readonly placeholder="এক্সট্রাক্ট করা নাম্বারগুলো এখানে আসবে..."></textarea>
+        
+        <button id="copyBtn" class="btn btn-copy" onclick="doCopy()">Copy Database</button>
+    </div>
+</div>
+
+<script>
+    let allSelected = false;
+
+    // সব সিলেক্ট বা ডিসিলেক্ট করার ফাংশন
+    function toggleSelectAll() {
+        const boxes = document.querySelectorAll('.row-check');
+        const btn = document.getElementById('selectAllBtn');
+        
+        allSelected = !allSelected; // স্টেট পরিবর্তন
+
+        boxes.forEach(box => {
+            box.checked = allSelected;
+        });
+
+        // বাটনের লেখা পরিবর্তন
+        btn.innerText = allSelected ? "Deselect All" : "Select All";
+        btn.style.backgroundColor = allSelected ? "#e91e63" : "#607d8b"; // সিলেক্ট হলে লালচে রঙ হবে
+    }
+
+    // নাম্বার এক্সট্রাক্ট করার ফাংশন
+    function doExtract() {
+        const boxes = document.querySelectorAll('.row-check');
+        const resArea = document.getElementById('resultArea');
+        const copyBtn = document.getElementById('copyBtn');
+        let selected = [];
+
+        boxes.forEach((box) => {
+            if (box.checked) {
+                const row = box.closest('tr');
+                const num = row.querySelector('.num-val').innerText.trim();
+                selected.push(num);
+            }
+        });
+
+        if (selected.length > 0) {
+            resArea.value = selected.join('\n'); // লাইন ডিমিলিটেড
+            resArea.style.display = 'block';
+            copyBtn.style.display = 'block';
+            resArea.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alert("দয়া করে অন্তত একটি নাম্বার সিলেক্ট করুন!");
+            resArea.style.display = 'none';
+            copyBtn.style.display = 'none';
+        }
+    }
+
+    // কপি করার ফাংশন
+    function doCopy() {
+        const area = document.getElementById('resultArea');
+        area.select();
+        area.setSelectionRange(0, 99999); // মোবাইলের জন্য
+
+        navigator.clipboard.writeText(area.value).then(() => {
+            const btn = document.getElementById('copyBtn');
+            const originalText = btn.innerText;
+            btn.innerText = "✓ Copied!";
+            btn.style.backgroundColor = "#075e54";
+            
+            setTimeout(() => { 
+                btn.innerText = originalText; 
+                btn.style.backgroundColor = "#34b7f1";
+            }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>

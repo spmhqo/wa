@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My WhatsApp Contact - Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient-start: #020617;
+      --bg-gradient-end: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.4);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-primary: #22d3ee;
+      --accent-hover: #67e8f9;
+      --accent-success: #10b981;
+      --accent-danger: #f43f5e;
+      --code-bg: rgba(0, 0, 0, 0.3);
+      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: fixed linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 35px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+      margin-bottom: 30px;
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .step-label {
+      font-weight: 800;
+      font-size: 0.8rem;
+      background: var(--accent-primary);
+      color: #020617;
+      padding: 5px 16px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .clear-btn {
+      background: transparent;
+      border: 1px solid var(--accent-danger);
+      color: var(--accent-danger);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .clear-btn:hover {
+      background: var(--accent-danger);
+      color: white;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .field-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--accent-primary);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .dynamic-input {
+      width: 100%;
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      padding: 12px 15px;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .dynamic-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    .prompt-content {
+      background: var(--code-bg);
+      padding: 30px;
+      border-radius: 12px;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 1rem;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 20px;
+      line-height: 1.5;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      width: 100%;
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      background: rgba(34, 211, 238, 0.1);
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+      transition: 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-primary);
+      color: #020617;
+    }
+
+    .copy-btn.copied {
+      background: var(--accent-success);
+      border-color: var(--accent-success);
+      color: white;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      padding-top: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>My WhatsApp Contact</h1>
+    </header>
+
+    <!-- INPUT SECTION -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-label">Data Input</span>
+        <button class="clear-btn" onclick="clearInputs()">Clear All</button>
+      </div>
+      <div class="input-group">
+        <div class="field-wrap">
+          <label>Name</label>
+          <input type="text" id="nameIn" class="dynamic-input" placeholder="Enter name..." oninput="updatePrompt()">
+        </div>
+        <div class="field-wrap">
+          <label>Note</label>
+          <input type="text" id="noteIn" class="dynamic-input" placeholder="Enter note..." oninput="updatePrompt()">
+        </div>
+        <div class="field-wrap">
+          <label>WhatsApp Number</label>
+          <input type="text" id="numberIn" class="dynamic-input" placeholder="Enter number..." oninput="updatePrompt()">
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT SECTION -->
+    <div class="step-card">
+      <div class="step-header">
+        <span class="step-label">Generated Snippet</span>
+      </div>
+      <div class="prompt-content" id="p1"></div>
+      <button class="copy-btn" id="copyBtn" onclick="copyResult()">
+        <span>Copy HTML Snippet</span>
+      </button>
+    </div>
+
+    <footer class="footer">
+      <p>Copyright &copy; <script>document.write(new Date().getFullYear())</script> Siva Prasad Mukherjee. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    // The exact prompt template provided
+    const template = `            <tr>
+                <td data-label="Name"><input type="checkbox" class="row-check"> [Name]</td>
+                <td data-label="Notes">[Note]</td>
+                <td data-label="WhatsApp Number" class="num-val">[WhatsApp Number]</td>
+            </tr>`;
+
+    // Function to update the prompt in real-time
+    function updatePrompt() {
+      const name = document.getElementById('nameIn').value.trim() || "[Name]";
+      const note = document.getElementById('noteIn').value.trim() || "[Note]";
+      const number = document.getElementById('numberIn').value.trim() || "[WhatsApp Number]";
+
+      // Robust global replacement using split/join
+      let result = template;
+      result = result.split("[Name]").join(name);
+      result = result.split("[Note]").join(note);
+      result = result.split("[WhatsApp Number]").join(number);
+
+      document.getElementById('p1').innerText = result;
+    }
+
+    // Function to clear all fields
+    function clearInputs() {
+      document.getElementById('nameIn').value = "";
+      document.getElementById('noteIn').value = "";
+      document.getElementById('numberIn').value = "";
+      updatePrompt();
+    }
+
+    // Robust copy function with fallback for local file usage
+    function copyResult() {
+      const text = document.getElementById('p1').innerText;
+      const btn = document.getElementById('copyBtn');
+      const originalHTML = btn.innerHTML;
+
+      function showSuccess() {
+        btn.innerHTML = `<span>Copied!</span>`;
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.classList.remove('copied');
+        }, 2000);
+      }
+
+      // Try modern Clipboard API
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(showSuccess);
+      } else {
+        // Fallback for non-HTTPS or local files
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          showSuccess();
+        } catch (err) {
+          console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(textArea);
+      }
+    }
+
+    // Initialize display on load
+    window.onload = updatePrompt;
+  </script>
+</body>
+</html>
